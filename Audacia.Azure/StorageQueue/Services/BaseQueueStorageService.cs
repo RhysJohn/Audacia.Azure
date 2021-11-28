@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Audacia.Azure.BlobStorage.Config;
 using Audacia.Azure.StorageQueue.Config;
+using Audacia.Azure.StorageQueue.Exceptions;
 using Azure.Storage.Blobs;
 using Azure.Storage.Queues;
 using Azure.Storage.Queues.Models;
@@ -26,7 +27,7 @@ namespace Audacia.Azure.StorageQueue.Services
 
         protected BaseQueueStorageService(QueueClient queueClient)
         {
-            QueueClient = queueClient ?? throw new Exception("Need to add QueueClient to the service collection");
+            QueueClient = queueClient ?? throw StorageQueueConfigurationException.QueueClientNotConfigured();
 
             _accountName = queueClient.AccountName;
         }
@@ -35,17 +36,17 @@ namespace Audacia.Azure.StorageQueue.Services
         {
             if (queueStorageConfig == null)
             {
-                throw new Exception("Need to add a value of IOptions<QueueStorageOption> to the DI");
+                throw StorageQueueConfigurationException.OptionsNotConfigured();
             }
 
             if (string.IsNullOrEmpty(queueStorageConfig.Value.AccountName))
             {
-                throw new Exception("Cannot connect to an Azure Queue storage with an null/empty account name");
+                throw StorageQueueConfigurationException.AccountNameNotConfigured();
             }
 
             if (string.IsNullOrEmpty(queueStorageConfig.Value.AccountKey))
             {
-                throw new Exception("Cannot connect to an Azure Queue storage with an null/empty account key");
+                throw StorageQueueConfigurationException.AccountKeyNotConfigured();
             }
 
             _accountName = queueStorageConfig.Value.AccountName;
@@ -62,7 +63,7 @@ namespace Audacia.Azure.StorageQueue.Services
 
             if (!queueExists)
             {
-                throw new Exception($"There is no queue with the name: {queueName}");
+                throw new QueueDoesNotExistException(queueName);
             }
         }
 
@@ -71,9 +72,9 @@ namespace Audacia.Azure.StorageQueue.Services
             var receivedMessageId = message.MessageId;
             var receivedMessagePopReceipt = message.PopReceipt;
 
-           var response = await QueueClient.DeleteMessageAsync(receivedMessageId, receivedMessagePopReceipt);
+            var response = await QueueClient.DeleteMessageAsync(receivedMessageId, receivedMessagePopReceipt);
 
-           return response.Status == 200; // might be 202 as might not execute
+            return response.Status == 200; // might be 202 as might not execute
         }
     }
 }

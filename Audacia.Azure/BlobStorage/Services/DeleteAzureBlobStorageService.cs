@@ -36,7 +36,7 @@ namespace Audacia.Azure.BlobStorage.Services
         /// <param name="containerName">The name of the container where the blob is stored.</param>
         /// <param name="blobName">The name of the blob you are wanting to remove.</param>
         /// <returns>Whether the removing of the blob was successful.</returns>
-        /// <exception cref="KeyNotFoundException"></exception>
+        /// <exception cref="BlobDoesNotExistException"></exception>
         public async Task<bool> ExecuteAsync(string containerName, string blobName)
         {
             var containerClient = BlobServiceClient.GetBlobContainerClient(containerName);
@@ -52,9 +52,7 @@ namespace Audacia.Azure.BlobStorage.Services
                 return result.Status == 202;
             }
 
-            throw new BlobDoesNotExistException();
-
-            throw new KeyNotFoundException($"Blob: {blobName} within Container: {containerName} does not exist and therefore unable to delete");
+            throw new BlobDoesNotExistException(blobName, containerName);
         }
     }
 }

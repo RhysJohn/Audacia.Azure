@@ -69,11 +69,10 @@ namespace Audacia.Azure.BlobStorage.Services
                     }
                 }
 
-                throw new ArgumentException("Blob doesnt exist therefore cannot update the specified blob");
+                throw new BlobDoesNotExistException(blobName, containerName);
             }
 
-            throw new ArgumentException(
-                "Container does not exist therefore cannot find the blob within the specified container");
+            throw new ContainerDoesNotExistException(containerName);
         }
 
         /// <summary>
@@ -111,15 +110,10 @@ namespace Audacia.Azure.BlobStorage.Services
                     }
                 }
 
-                throw new BlobDoesNotExistException();
-
-                throw new ArgumentException("Blob doesnt exist therefore cannot update the specified blob");
+                throw new BlobDoesNotExistException(blobName, containerName);
             }
 
-            throw new ContainerDoesNotExistException();
-
-            throw new ArgumentException(
-                "Container does not exist therefore cannot find the blob within the specified container");
+            throw new ContainerDoesNotExistException(containerName);
         }
     }
 }

@@ -40,7 +40,7 @@ namespace Audacia.Azure.BlobStorage.Services
         /// <param name="filePath">The full file path to the location of the file which you want to upload</param>
         /// <param name="doesContainerExist">Whether or not the container already exist</param>
         /// <returns>A bool depending on the success of the upload</returns>
-        /// <exception cref="ArgumentException"></exception>
+        /// <exception cref="BlobNameAlreadyExistsException"></exception>
         public async Task<bool> ExecuteAsync(string containerName, string blobName, string filePath,
             bool doesContainerExist = true)
         {
@@ -67,10 +67,7 @@ namespace Audacia.Azure.BlobStorage.Services
                     }
                 }
 
-                throw new BlobNameAlreadyExistsException();
-
-                throw new ArgumentException(
-                    "Cannot add Blob as there is an exist blob therefore we are preventing overwriting any data.");
+                throw new BlobNameAlreadyExistsException(blobName, containerName);
             }
 
             return false;
@@ -85,7 +82,7 @@ namespace Audacia.Azure.BlobStorage.Services
         /// <param name="fileData">Byte array of the data which you want to upload to the storage account</param>
         /// <param name="doesContainerExist">Whether or not the container already exist</param>
         /// <returns>A bool depending on the success of the upload</returns>
-        /// <exception cref="ArgumentException"></exception>
+        /// <exception cref="BlobNameAlreadyExistsException"></exception>
         public async Task<bool> ExecuteAsync(string containerName, string blobName, byte[] fileData,
             bool doesContainerExist = true)
         {
@@ -109,10 +106,8 @@ namespace Audacia.Azure.BlobStorage.Services
                         return result != null;
                     }
                 }
-
-                throw new BlobNameAlreadyExistsException();
-                throw new ArgumentException(
-                    "Cannot add Blob as there is an exist blob therefore we are preventing overwriting any data.");
+                
+                throw new BlobNameAlreadyExistsException(blobName, containerName);
             }
 
             return false;
@@ -127,7 +122,7 @@ namespace Audacia.Azure.BlobStorage.Services
         /// <param name="fileData">A stream of the data of the blob to be added to the storage account</param>
         /// <param name="doesContainerExist">Whether or not the container already exist</param>
         /// <returns>A bool depending on the success of the upload</returns>
-        /// <exception cref="ArgumentException"></exception>
+        /// <exception cref="BlobNameAlreadyExistsException"></exception>
         public async Task<bool> ExecuteAsync(string containerName, string blobName, Stream fileData,
             bool doesContainerExist = true)
         {
@@ -149,10 +144,7 @@ namespace Audacia.Azure.BlobStorage.Services
                     return result != null;
                 }
 
-                throw new BlobNameAlreadyExistsException();
-
-                throw new ArgumentException(
-                    "Cannot add Blob as there is an exist blob therefore we are preventing overwriting any data.");
+                throw new BlobNameAlreadyExistsException(blobName, containerName);
             }
 
             return false;
