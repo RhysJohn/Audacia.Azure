@@ -5,6 +5,7 @@ using Audacia.Azure.BlobStorage.BaseServices;
 using Audacia.Azure.BlobStorage.Config;
 using Audacia.Azure.BlobStorage.Exceptions;
 using Audacia.Azure.BlobStorage.Services.Interfaces;
+using Azure;
 using Azure.Storage.Blobs;
 using Microsoft.Extensions.Options;
 
@@ -58,12 +59,17 @@ namespace Audacia.Azure.BlobStorage.Services
 
                 if (!blobExists.Value)
                 {
-                    using (var ms = new MemoryStream(fileData, false))
+                    await using (var ms = new MemoryStream(fileData, false))
                     {
-                        var result = await blobClient.UploadAsync(ms);
-
-                        // The result will be null if it failed
-                        return result != null;
+                        try
+                        {
+                            await blobClient.UploadAsync(ms);
+                            return true;
+                        }
+                        catch (RequestFailedException _)
+                        {
+                            return false;
+                        }
                     }
                 }
 
@@ -98,15 +104,20 @@ namespace Audacia.Azure.BlobStorage.Services
 
                 if (!blobExists.Value)
                 {
-                    using (var ms = new MemoryStream(fileData, false))
+                    await using (var ms = new MemoryStream(fileData, false))
                     {
-                        var result = await blobClient.UploadAsync(ms);
-
-                        // The result will be null if it failed
-                        return result != null;
+                        try
+                        {
+                            await blobClient.UploadAsync(ms);
+                            return true;
+                        }
+                        catch (RequestFailedException _)
+                        {
+                            return false;
+                        }
                     }
                 }
-                
+
                 throw new BlobNameAlreadyExistsException(blobName, containerName);
             }
 
@@ -138,10 +149,15 @@ namespace Audacia.Azure.BlobStorage.Services
 
                 if (!blobExists.Value)
                 {
-                    var result = await blobClient.UploadAsync(fileData);
-
-                    // The result will be null if it failed
-                    return result != null;
+                    try
+                    {
+                        await blobClient.UploadAsync(fileData);
+                        return true;
+                    }
+                    catch (RequestFailedException _)
+                    {
+                        return false;
+                    }
                 }
 
                 throw new BlobNameAlreadyExistsException(blobName, containerName);

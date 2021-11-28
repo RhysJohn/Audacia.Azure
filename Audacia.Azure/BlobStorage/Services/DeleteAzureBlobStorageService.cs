@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Audacia.Azure.BlobStorage.BaseServices;
 using Audacia.Azure.BlobStorage.Config;
 using Audacia.Azure.BlobStorage.Exceptions;
 using Audacia.Azure.BlobStorage.Services.Interfaces;
+using Azure;
 using Azure.Storage.Blobs;
 using Microsoft.Extensions.Options;
 
@@ -26,10 +28,11 @@ namespace Audacia.Azure.BlobStorage.Services
         /// Constructor option for using the Options pattern with <see cref="BlobStorageOption"/>. 
         /// </summary>
         /// <param name="blobStorageConfig"></param>
-        public DeleteAzureAzureBlobStorageService(IOptions<BlobStorageOption> blobStorageConfig) : base(blobStorageConfig)
+        public DeleteAzureAzureBlobStorageService(IOptions<BlobStorageOption> blobStorageConfig) : base(
+            blobStorageConfig)
         {
         }
-        
+
         /// <summary>
         /// Removes a blob with the <paramref name="blobName"/> within <paramref name="containerName"/>.
         /// </summary>
@@ -47,9 +50,16 @@ namespace Audacia.Azure.BlobStorage.Services
             if (blobExists.Value)
             {
                 // Delete the blob from the container
-                var result = await blobClient.DeleteAsync();
+                try
+                {
+                    await blobClient.DeleteAsync();
 
-                return result.Status == 202;
+                    return true;
+                }
+                catch (RequestFailedException _)
+                {
+                    return false;
+                }
             }
 
             throw new BlobDoesNotExistException(blobName, containerName);
