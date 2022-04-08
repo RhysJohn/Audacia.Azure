@@ -21,12 +21,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="BaseAzureTests" />
-      <Folder Include="ServiceBusQueue" />
-      <Folder Include="StorageQueue" />
-    </ItemGroup>
-
-    <ItemGroup>
       <ProjectReference Include="..\Audacia.Azure\Audacia.Azure.csproj" />
     </ItemGroup>
 

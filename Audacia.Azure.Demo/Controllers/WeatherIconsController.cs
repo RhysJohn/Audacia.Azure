@@ -58,7 +58,7 @@ namespace Audacia.Azure.Demo.Controllers
             {
                 _logger.LogError(e.Message);
 
-                return BadRequest();
+                return BadRequest(e.Message);
             }
         }
 
@@ -80,7 +80,7 @@ namespace Audacia.Azure.Demo.Controllers
                 return Ok(uniqueBlobName);
             }
 
-            return BadRequest();
+            return BadRequest("Failed to add blob");
         }
 
         [HttpPut]
@@ -107,7 +107,7 @@ namespace Audacia.Azure.Demo.Controllers
                 return Ok();
             }
 
-            return BadRequest();
+            return BadRequest("Failed to update blob");
         }
 
         [HttpDelete]
@@ -122,10 +122,10 @@ namespace Audacia.Azure.Demo.Controllers
 
             if (deleteBlobResult)
             {
-                return Accepted();
+                return Ok();
             }
 
-            return BadRequest();
+            return BadRequest("Failed to delete blob");
         }
     }
 }

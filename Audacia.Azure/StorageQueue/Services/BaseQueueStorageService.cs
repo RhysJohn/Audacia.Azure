@@ -10,6 +10,9 @@ using Microsoft.Extensions.Options;
 
 namespace Audacia.Azure.StorageQueue.Services
 {
+    /// <summary>
+    /// Base service for Azure queue storage.
+    /// </summary>
     public class BaseQueueStorageService
     {
         private readonly string _storageAccountConnectionString =
@@ -25,6 +28,11 @@ namespace Audacia.Azure.StorageQueue.Services
 
         protected QueueClient QueueClient;
 
+        /// <summary>
+        /// Client variation of the Constructor.
+        /// </summary>
+        /// <param name="queueClient"><see cref="QueueClient"/> from Ioc</param>
+        /// <exception cref="StorageQueueConfigurationException">If <see cref="QueueClient"/> has not been configured.</exception>
         protected BaseQueueStorageService(QueueClient queueClient)
         {
             QueueClient = queueClient ?? throw StorageQueueConfigurationException.QueueClientNotConfigured();
@@ -32,6 +40,13 @@ namespace Audacia.Azure.StorageQueue.Services
             _accountName = queueClient.AccountName;
         }
 
+        /// <summary>
+        /// Options variation of the Constructor.
+        /// </summary>
+        /// <param name="queueStorageConfig">Options of <see cref="QueueStorageOption"/>.</param>
+        /// <exception cref="StorageQueueConfigurationException">
+        /// Exception if there is a miss configuration with <see cref="QueueStorageOption"/>.
+        /// </exception>
         protected BaseQueueStorageService(IOptions<QueueStorageOption> queueStorageConfig)
         {
             if (queueStorageConfig?.Value == null)
@@ -55,6 +70,13 @@ namespace Audacia.Azure.StorageQueue.Services
                 queueStorageConfig.Value.AccountName, queueStorageConfig.Value.AccountKey);
         }
 
+        /// <summary>
+        /// Checks on the queue before any actions are done.
+        /// </summary>
+        /// <param name="queueName">Name of the queue you are checking</param>
+        /// <exception cref="QueueDoesNotExistException">
+        /// If the queue you are wanting to do something with, does not exist.
+        /// </exception>
         protected async Task PreQueueChecksAsync(string queueName)
         {
             QueueClient = new QueueClient(StorageAccountConnectionString, queueName);
@@ -67,6 +89,11 @@ namespace Audacia.Azure.StorageQueue.Services
             }
         }
 
+        /// <summary>
+        /// Deletes a message from a <see cref="QueueClient"/>.
+        /// </summary>
+        /// <param name="message"><see cref="QueueMessage"/> to be removed from the <see cref="QueueClient"/>.</param>
+        /// <returns>Whether the message has been removed.</returns>
         protected async Task<bool> DeleteMessageAsync(QueueMessage message)
         {
             var receivedMessageId = message.MessageId;

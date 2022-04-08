@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Audacia.Azure.BlobStorage.Config;
+using Audacia.Azure.BlobStorage.Exceptions;
 using Audacia.Azure.BlobStorage.Services.Base;
 using Audacia.Azure.BlobStorage.Services.Interfaces;
 using Audacia.Azure.ReturnOptions;
@@ -47,12 +48,20 @@ namespace Audacia.Azure.BlobStorage.Services
         public async Task<T> GetAsync<T, TResponse>(string containerName, string blobName)
             where TResponse : IBlobReturnOption<T>, new()
         {
-            var containerClient = BlobServiceClient.GetBlobContainerClient(containerName);
+            var containers = BlobServiceClient.GetBlobContainers();
+            var containerExists = containers.Any(container => container.Name == containerName);
 
-            var blobBytes = await GetBlobBytesAsync(containerClient, blobName);
+            if (containerExists)
+            {
+                var containerClient = BlobServiceClient.GetBlobContainerClient(containerName);
 
-            return new TResponse().Parse(blobName, blobBytes,
-                string.Format(StorageAccountWithContainer, containerName));
+                var blobBytes = await GetBlobBytesAsync(containerClient, blobName);
+
+                return new TResponse().Parse(blobName, blobBytes,
+                    string.Format(StorageAccountWithContainer, containerName));
+            }
+
+            throw new ContainerDoesNotExistException(containerName);
         }
 
         /// <summary>
@@ -69,19 +78,27 @@ namespace Audacia.Azure.BlobStorage.Services
             IEnumerable<string> blobNames)
             where TResponse : IBlobReturnOption<T>, new()
         {
-            var containerClient = BlobServiceClient.GetBlobContainerClient(containerName);
+            var containers = BlobServiceClient.GetBlobContainers();
+            var containerExists = containers.Any(container => container.Name == containerName);
 
-            var blobBytesDictionary = new Dictionary<string, T>();
-            foreach (var blobName in blobNames)
+            if (containerExists)
             {
-                var blobBytes = await GetBlobBytesAsync(containerClient, blobName);
-                var parsedResult = new TResponse().Parse(blobName, blobBytes,
-                    string.Format(StorageAccountWithContainer, containerName));
+                var containerClient = BlobServiceClient.GetBlobContainerClient(containerName);
 
-                blobBytesDictionary.Add(blobName, parsedResult);
+                var blobBytesDictionary = new Dictionary<string, T>();
+                foreach (var blobName in blobNames)
+                {
+                    var blobBytes = await GetBlobBytesAsync(containerClient, blobName);
+                    var parsedResult = new TResponse().Parse(blobName, blobBytes,
+                        string.Format(StorageAccountWithContainer, containerName));
+
+                    blobBytesDictionary.Add(blobName, parsedResult);
+                }
+
+                return blobBytesDictionary;
             }
 
-            return blobBytesDictionary;
+            throw new ContainerDoesNotExistException(containerName);
         }
 
         /// <summary>
@@ -95,23 +112,31 @@ namespace Audacia.Azure.BlobStorage.Services
         public async Task<IDictionary<string, T>> GetAllAsync<T, TResponse>(string containerName)
             where TResponse : IBlobReturnOption<T>, new()
         {
-            var containerClient = BlobServiceClient.GetBlobContainerClient(containerName);
-            var pagedBlobs = containerClient.GetBlobs();
+            var containers = BlobServiceClient.GetBlobContainers();
+            var containerExists = containers.Any(container => container.Name == containerName);
 
-            var blobs = pagedBlobs.ToList();
-
-            var blobBytesDictionary = new Dictionary<string, T>();
-
-            foreach (var blob in blobs)
+            if (containerExists)
             {
-                var blobBytes = await GetBlobBytesAsync(containerClient, blob.Name);
-                var parsedResult = new TResponse().Parse(blob.Name, blobBytes,
-                    string.Format(StorageAccountWithContainer, containerName));
+                var containerClient = BlobServiceClient.GetBlobContainerClient(containerName);
+                var pagedBlobs = containerClient.GetBlobs();
 
-                blobBytesDictionary.Add(blob.Name, parsedResult);
+                var blobs = pagedBlobs.ToList();
+
+                var blobBytesDictionary = new Dictionary<string, T>();
+
+                foreach (var blob in blobs)
+                {
+                    var blobBytes = await GetBlobBytesAsync(containerClient, blob.Name);
+                    var parsedResult = new TResponse().Parse(blob.Name, blobBytes,
+                        string.Format(StorageAccountWithContainer, containerName));
+
+                    blobBytesDictionary.Add(blob.Name, parsedResult);
+                }
+
+                return blobBytesDictionary;
             }
 
-            return blobBytesDictionary;
+            throw new ContainerDoesNotExistException(containerName);
         }
 
         /// <summary>

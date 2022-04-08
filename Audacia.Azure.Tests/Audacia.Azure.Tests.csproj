@@ -51,8 +51,15 @@
         </Reference>
     </ItemGroup>
     <ItemGroup>
+        <Compile Include="BlobStorage\ConfigAzureBlobStorageTests.cs" />
+        <Compile Include="BlobStorage\SetupAzureBlobStorageTests.cs" />
         <Compile Include="Tests.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
+    </ItemGroup>
+    <ItemGroup>
+      <Folder Include="BaseAzureTests" />
+      <Folder Include="ServiceBusQueue" />
+      <Folder Include="StorageQueue" />
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
     <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

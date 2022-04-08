@@ -2,6 +2,9 @@
 
 namespace Audacia.Azure.StorageQueue.Models
 {
+    /// <summary>
+    /// Message object pulled from the queue.
+    /// </summary>
     public class AzureQueueStorageMessage
     {
         public string MessageId { get; }
