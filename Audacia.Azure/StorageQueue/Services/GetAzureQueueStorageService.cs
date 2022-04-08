@@ -46,7 +46,6 @@ namespace Audacia.Azure.StorageQueue.Services
         {
             await PreQueueChecksAsync(queueName);
 
-            // check if there is a message to pull
             var queueProperties = await QueueClient.GetPropertiesAsync();
             if (queueProperties.Value.ApproximateMessagesCount > 0)
             {
@@ -87,7 +86,6 @@ namespace Audacia.Azure.StorageQueue.Services
         {
             await PreQueueChecksAsync(queueName);
 
-            // check if there is a message to pull
             var queueProperties = await QueueClient.GetPropertiesAsync();
             if (queueProperties.Value.ApproximateMessagesCount > 0)
             {

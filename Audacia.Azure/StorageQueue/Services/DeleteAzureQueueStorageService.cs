@@ -41,9 +41,9 @@ namespace Audacia.Azure.StorageQueue.Services
         {
             await PreQueueChecksAsync(queueName);
 
-            var bob = await QueueClient.ReceiveMessagesAsync();
+            var queueMessages = await QueueClient.ReceiveMessagesAsync();
 
-            var peekedMessages = bob.Value;
+            var peekedMessages = queueMessages.Value;
 
             var peekMessage = peekedMessages.WithMessageId(messageId).FirstOrDefault();
 

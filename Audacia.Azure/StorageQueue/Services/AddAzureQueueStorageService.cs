@@ -37,7 +37,7 @@ namespace Audacia.Azure.StorageQueue.Services
         public async Task<SendReceipt> ExecuteAsync(string queueName, string queueMessage)
         {
             await PreQueueChecksAsync(queueName);
-
+            
             var response = await QueueClient.SendMessageAsync(queueMessage);
 
             return response.Value;

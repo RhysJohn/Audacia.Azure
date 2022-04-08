@@ -4,7 +4,7 @@ using Audacia.Azure.BlobStorage.Config;
 using Azure.Storage.Blobs;
 using Microsoft.Extensions.Options;
 
-namespace Audacia.Azure.BlobStorage.BaseServices
+namespace Audacia.Azure.BlobStorage.Services.Base
 {
     /// <summary>
     /// Base class for adding and updating blobs.

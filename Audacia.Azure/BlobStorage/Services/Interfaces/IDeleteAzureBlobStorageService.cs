@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Audacia.Azure.BlobStorage.Commands.DeleteCommands;
 
 namespace Audacia.Azure.BlobStorage.Services.Interfaces
 {
@@ -8,11 +9,10 @@ namespace Audacia.Azure.BlobStorage.Services.Interfaces
     public interface IDeleteAzureBlobStorageService
     {
         /// <summary>
-        /// Removes a blob with the <paramref name="blobName"/> within <paramref name="containerName"/>.
+        /// Removes a blob with the <paramref name="command.BlobName"/> within <paramref name="command.ContainerName"/>.
         /// </summary>
-        /// <param name="containerName">The name of the container where the blob is stored.</param>
-        /// <param name="blobName">The name of the blob you are wanting to remove.</param>
+        /// <param name="command">Command request containing all the information to remove a blob.</param>
         /// <returns>Whether the removing of the blob was successful.</returns>
-        Task<bool> ExecuteAsync(string containerName, string blobName);
+        Task<bool> ExecuteAsync(DeleteAzureBlobStorageCommand command);
     }
 }

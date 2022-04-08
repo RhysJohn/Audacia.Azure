@@ -34,7 +34,7 @@ namespace Audacia.Azure.StorageQueue.Services
 
         protected BaseQueueStorageService(IOptions<QueueStorageOption> queueStorageConfig)
         {
-            if (queueStorageConfig == null)
+            if (queueStorageConfig?.Value == null)
             {
                 throw StorageQueueConfigurationException.OptionsNotConfigured();
             }

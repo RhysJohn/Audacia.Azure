@@ -14,7 +14,7 @@ namespace Audacia.Azure.Demo.Extensions.ServiceCollectionExtensions
             return serviceCollection.AddScoped<IGetAzureBlobStorageService, GetAzureAzureBlobStorageService>()
                 .AddScoped<IAddAzureBlobStorageService, AddAzureBlobStorageService>()
                 .AddScoped<IUpdateAzureBlobStorageService, AzureUpdateAzureBlobStorageService>()
-                .AddScoped<IDeleteAzureBlobStorageService, DeleteAzureAzureBlobStorageService>();
+                .AddScoped<IDeleteAzureBlobStorageService, DeleteAzureBlobStorageService>();
         }
 
         public static IServiceCollection AddAzureQueueServices(this IServiceCollection serviceCollection)

@@ -7,5 +7,6 @@
     {
         public const string OptionConfigLocation = "Azure:ServiceBusQueueConfig";
         
+        
     }
 }

@@ -1,12 +1,11 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Audacia.Azure.BlobStorage.Config;
 using Audacia.Azure.BlobStorage.Exceptions;
 using Audacia.Azure.BlobStorage.Extensions;
 using Azure.Storage.Blobs;
 using Microsoft.Extensions.Options;
 
-namespace Audacia.Azure.BlobStorage.BaseServices
+namespace Audacia.Azure.BlobStorage.Services.Base
 {
     public abstract class BaseAzureBlobStorageService
     {
@@ -23,19 +22,14 @@ namespace Audacia.Azure.BlobStorage.BaseServices
 
         protected BaseAzureBlobStorageService(BlobServiceClient blobServiceClient)
         {
-            if (blobServiceClient == null)
-            {
-                throw BlobStorageConfigurationException.BlobClientNotConfigured();
-            }
-
-            BlobServiceClient = blobServiceClient;
+            BlobServiceClient = blobServiceClient ?? throw BlobStorageConfigurationException.BlobClientNotConfigured();
 
             _accountName = blobServiceClient.AccountName;
         }
 
         protected BaseAzureBlobStorageService(IOptions<BlobStorageOption> blobStorageConfig)
         {
-            if (blobStorageConfig == null)
+            if (blobStorageConfig?.Value == null)
             {
                 throw BlobStorageConfigurationException.OptionsNotConfigured();
             }
@@ -63,8 +57,6 @@ namespace Audacia.Azure.BlobStorage.BaseServices
             if (string.IsNullOrEmpty(containerName))
             {
                 throw ContainerNameInvalidException.UnableToFindWithContainerName();
-
-                throw new Exception("Cannot find a blob container with a name that is null / empty");
             }
 
             return BlobServiceClient.GetBlobContainerClient(containerName);
@@ -87,7 +79,7 @@ namespace Audacia.Azure.BlobStorage.BaseServices
         /// <param name="doesContainerExist"></param>
         /// <exception cref="ContainerDoesNotExistException"></exception>
         /// <exception cref="ContainerAlreadyExistsException"></exception>
-        protected void PreContainerChecks(string containerName, bool doesContainerExist)
+        protected void ContainerChecks(string containerName, bool doesContainerExist)
         {
             var storageAccountContainers = BlobServiceClient.GetBlobContainers();
 

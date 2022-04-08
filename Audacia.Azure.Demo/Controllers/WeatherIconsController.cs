@@ -2,6 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using Audacia.Azure.BlobStorage.Commands.AddCommands;
+using Audacia.Azure.BlobStorage.Commands.DeleteCommands;
+using Audacia.Azure.BlobStorage.Commands.UpdateCommands;
+using Audacia.Azure.BlobStorage.Services;
 using Audacia.Azure.BlobStorage.Services.Interfaces;
 using Audacia.Azure.Demo.Models.Requests;
 using Audacia.Azure.ReturnOptions.ImageOption;
@@ -16,8 +20,11 @@ namespace Audacia.Azure.Demo.Controllers
     public class WeatherForecastController : ControllerBase
     {
         private readonly IGetAzureBlobStorageService _getAzureBlobStorageService;
+
         private readonly IAddAzureBlobStorageService _addAzureBlobStorageService;
+
         private readonly IUpdateAzureBlobStorageService _updateAzureBlobStorageService;
+
         private readonly IDeleteAzureBlobStorageService _deleteAzureBlobStorageService;
 
         private readonly ILogger<WeatherForecastController> _logger;
@@ -64,9 +71,9 @@ namespace Audacia.Azure.Demo.Controllers
 
             await using var fileStream = request.File.OpenReadStream();
 
-            var addBlobResult = await _addAzureBlobStorageService.ExecuteAsync(request.ContainerName,
-                uniqueBlobName,
-                fileStream);
+            var command = new AddAzureBlobStorageStreamCommand(request.ContainerName, uniqueBlobName, fileStream);
+
+            var addBlobResult = await _addAzureBlobStorageService.ExecuteAsync(command);
 
             if (addBlobResult)
             {
@@ -89,9 +96,11 @@ namespace Audacia.Azure.Demo.Controllers
                 fileBytes = ms.ToArray();
             }
 
-            var updateBlobResult = await _updateAzureBlobStorageService.ExecuteAsync(updateBlobRequest.ContainerName,
+            var command = new UpdateAzureBlobStorageBytesCommand(updateBlobRequest.ContainerName,
                 updateBlobRequest.BlobName,
                 fileBytes);
+
+            var updateBlobResult = await _updateAzureBlobStorageService.ExecuteAsync(command);
 
             if (updateBlobResult)
             {
@@ -106,8 +115,10 @@ namespace Audacia.Azure.Demo.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Delete([FromForm] DeleteBlobRequest deleteBlobRequest)
         {
-            var deleteBlobResult = await _deleteAzureBlobStorageService.ExecuteAsync(deleteBlobRequest.ContainerName,
-                deleteBlobRequest.BlobName);
+            var command =
+                new DeleteAzureBlobStorageCommand(deleteBlobRequest.ContainerName, deleteBlobRequest.BlobName);
+
+            var deleteBlobResult = await _deleteAzureBlobStorageService.ExecuteAsync(command);
 
             if (deleteBlobResult)
             {

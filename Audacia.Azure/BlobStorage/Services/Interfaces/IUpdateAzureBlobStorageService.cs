@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Audacia.Azure.BlobStorage.Commands.UpdateCommands;
 
 namespace Audacia.Azure.BlobStorage.Services.Interfaces
 {
@@ -7,25 +8,32 @@ namespace Audacia.Azure.BlobStorage.Services.Interfaces
     /// </summary>
     public interface IUpdateAzureBlobStorageService
     {
+        /// <summary>
+        /// Update an existing blob with the file data from the file stored at <paramref name="command.FilePath"/>.
+        /// </summary>
+        /// <param name="command">Command request containing all the information to upload a blob.</param>
+        /// <returns>A bool depending on the success of the upload</returns>
+        Task<bool> ExecuteAsync(UpdateAzureBlobStorageFileCommand command);
         
         /// <summary>
-        /// Update an existing blob with the file data from the file stored at <paramref name="filePath"/>.
+        /// Update an existing blob with the file data contained within the <paramref name="command.FileData"/>.
         /// </summary>
-        /// <param name="containerName">The name of the container where you want the blob to be added</param>
-        /// <param name="blobName">The name of the blob which is going to be added to the storage account</param>
-        /// <param name="filePath">The full file path to the location of the file which you want to upload</param>
-        /// <param name="doesContainerExist">Whether or not the container already exist</param>
+        /// <param name="command">Command request containing all the information to upload a blob.</param>
         /// <returns>A bool depending on the success of the upload</returns>
-        Task<bool> ExecuteAsync(string containerName, string blobName, string filePath, bool doesContainerExist = true);
+        Task<bool> ExecuteAsync(UpdateAzureBlobStorageBytesCommand command);
         
         /// <summary>
-        /// Update an existing blob with the file data contained within the <paramref name="fileData"/>.
+        /// Update an existing blob with the file data contained within the <paramref name="command.FileData"/>.
         /// </summary>
-        /// <param name="containerName">The name of the container where you want the blob to be added</param>
-        /// <param name="blobName">The name of the blob which is going to be added to the storage account</param>
-        /// <param name="fileData">The full file path to the location of the file which you want to upload</param>
-        /// <param name="doesContainerExist">Whether or not the container already exist</param>
+        /// <param name="command">Command request containing all the information to upload a blob.</param>
         /// <returns>A bool depending on the success of the upload</returns>
-        Task<bool> ExecuteAsync(string containerName, string blobName, byte[] fileData, bool doesContainerExist = true);
+        Task<bool> ExecuteAsync(UpdateAzureBlobStorageBase64Command command);
+        
+        /// <summary>
+        /// Update an existing blob with the file data contained within the <paramref name="command.FileData"/>.
+        /// </summary>
+        /// <param name="command">Command request containing all the information to upload a blob.</param>
+        /// <returns>A bool depending on the success of the upload</returns>
+        Task<bool> ExecuteAsync(UpdateAzureBlobStorageStreamCommand command);
     }
 }
